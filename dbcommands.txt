@@ -1,0 +1,9 @@
+psql -U postgres
+antonov140
+
+\l
+
+CREATE DATABASE kolabdb;
+
+\l
+
