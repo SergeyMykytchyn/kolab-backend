@@ -1,0 +1,295 @@
+Все запросы к серверу начинаются так: https://kolab-plumboomteam-api.herokuapp.com/api
+Дальше идет название определенного эндпоинта например: /User/sign-up
+То есть итого запрос на сервер будет иметь следующий вид: https://kolab-plumboomteam-api.herokuapp.com/api/User/sign-up
+
+Дальше идет список эндпоинтов и их сигнатуры
+
+Эндпоинт для регистрации нового пользователя: /User/sign-up
+Request Method: POST
+Request Payload: {
+  email: string
+  firstName: string
+  lastName: string
+  password: string
+  passwordConfirm: string
+  role: "teacher" || "student"
+}
+Response: {
+  message: "User was created"
+}
+
+Эндпоинт для авторизации пользователя: /User/sign-in
+Request Method: POST
+Request Payload: {
+  email: string
+  password: string
+}
+Response: {
+  token: string
+}
+
+Эндпоинт для получения информации о пользователе: /User/user-info
+Request Method: GET
+Authorization: Bearer [token]
+Response: {
+  email: string
+  firstName: string
+  id: string
+  lastName: string
+  password: null
+  role: "teacher" || "student"
+}
+
+Эндпоинт для получения информации о всех текущих проектов пользователя: /Group/?userId=
+Request Method: GET
+Authorization: Bearer [token]
+Response: [
+  {
+    childGroups: []
+    creator: {
+      email: string
+      firstName: string
+      id: string
+      lastName: string
+      password: null
+      role: null
+    }
+    creatorId: string
+    description: string
+    id: number
+    identificator: string
+    name: string
+    parentGroupId: null
+    participants: []
+    tasks: []
+    usefulContent: null
+  }
+]
+
+Эндпоинт для создания нового проекта: /Group
+Request Method: POST
+Authorization: Bearer [token]
+Request Payload: {
+  description: string
+  name: string
+}
+Response: {
+  childGroups: []
+  creator: null
+  creatorId: string
+  description: string
+  id: number
+  identificator: string
+  name: string
+  parentGroupId: null
+  participants: []
+  tasks: []
+  usefulContent: null
+}
+
+Эндпоинт для редактирования уже существующего проекта: /Group
+Request Method: PUT
+Authorization: Bearer [token]
+Request Payload: {
+  childGroups: []
+  creator: {
+    firstName: string
+    lastName: string
+  }
+  creatorId: string
+  description: string
+  id: number
+  identificator: string
+  name: string
+  parentGroupId: null
+  participants: []
+  tasks: []
+  usefulContent: null
+}
+Response: {
+  message: "Group was updated"
+}
+
+Эндпоинт для того чтобы покинуть проект: /User/leave-group?groupId=
+Request Method: POST
+Authorization: Bearer [token]
+Request Payload: {}
+Response: {
+  message: "Ok"
+}
+
+Эндпоинт для того чтобы удалить проект: /Group/[groupId]
+Request Method: DELETE
+Authorization: Bearer [token]
+Response: {
+  message: "Group was deleted"
+}
+
+Эндпоинт для того чтобы присоединится к проекту: /Group/add-with-identificator
+Request Method: POST
+Authorization: Bearer [token]
+Request Payload: string
+Response: {
+  childGroups: []
+  creator: {
+    email: string
+    firstName: string
+    id: string
+    lastName: string
+    password: null
+    role: null
+  }
+  creatorId: string
+  description: string
+  id: number
+  identificator: string
+  name: string
+  parentGroupId: null
+  participants: []
+  tasks: []
+  usefulContent: null
+}
+
+Эндпоинт для получения информации о задачах на текущем проекте: /Post/?groupId=
+Request Method: GET
+Authorization: Bearer [token]
+Response: [
+  {
+    acknowledgeUsers: [
+      {
+        email: string
+        firstName: string
+        id: string
+        lastName: string
+        password: null
+        role: null
+      }
+    ]
+    caption: string
+    comments: []
+    description: string
+    forms: []
+    groupId: number
+    id: number
+  }
+]
+
+Эндпоинт для получения информации о текущем проекте /Group/[groupId]
+Request Method: GET
+Authorization: Bearer [token]
+Response: {
+  childGroups: []
+  creator: {
+    email: string
+    firstName: string
+    id: string
+    lastName: string
+    password: null
+    role: null
+  }
+  creatorId: string
+  description: string
+  id: number
+  identificator: string
+  name: string
+  parentGroupId: null
+  participants: [
+    {
+      email: string
+      firstName: string
+      id: string
+      lastName: string
+      password: null
+      role: null
+    }
+  ]
+  tasks: []
+  usefulContent: null
+}
+
+Эндпоинт для создания нового задания: /Post
+Request Method: POST
+Authorization: Bearer [token]
+Request Payload: {
+  caption: string
+  description: string
+  groupId: number
+}
+Response: {
+  acknowledgeUsers: []
+  caption: string
+  comments: []
+  description: string
+  forms: []
+  groupId: number
+  id: number
+}
+
+Эндпоинт для создания сообщения в задании: /Form
+Request Method: POST
+Authorization: Bearer [token]
+Request Payload: {
+  content: string
+  postId: number
+}
+Response: {
+  content: string
+  id: number
+  postId: number
+  user: {
+    email: null
+    firstName: null
+    id: string
+    lastName: null
+    password: null
+    role: null
+  }
+}
+
+Эндпоинт для получения информации о текущем задании: /Post/[postId]
+Request Method: GET
+Authorization: Bearer [token]
+Response: {
+  acknowledgeUsers: [
+    {
+      email: string
+      firstName: string
+      id: string
+      lastName: string
+      password: null
+      role: null
+    }
+  ]
+  caption: string
+  comments: []
+  description: string
+  forms: [
+    {
+      content: string
+      id: number
+      postId: number
+      user: {
+        email: string
+        firstName: string
+        id: string
+        lastName: string
+        password: null
+        role: null
+      }
+    }
+  ]
+  groupId: number
+  id: number
+}
+
+Эндпоинт для обновления сообщения в текущем задании: /Form
+Request Method: PUT
+Authorization: Bearer [token]
+Request Payload: {
+  content: string
+  id: number
+  postId: number
+}
+Response: {
+  message: "Form was updated"
+}
