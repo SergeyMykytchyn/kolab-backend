@@ -6,4 +6,3 @@ antonov140
 CREATE DATABASE kolabdb;
 
 \l
-
