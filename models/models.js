@@ -1,5 +1,5 @@
 const sequelize = require("../db");
-const { DataTypes } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const User = sequelize.define("user", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -14,7 +14,7 @@ const Group = sequelize.define("group", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.STRING },
-  identificator: { type: DataTypes.STRING, allowNull: false }
+  identificator: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, unique: true }
 });
 
 User.hasMany(Group);
