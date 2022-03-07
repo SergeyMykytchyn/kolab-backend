@@ -46,3 +46,11 @@ Form.belongsTo(User);
 
 Post.hasMany(Form);
 Form.belongsTo(Post);
+
+module.exports = {
+  User,
+  Group,
+  Participant,
+  Post,
+  Form
+};
