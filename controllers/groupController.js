@@ -46,10 +46,10 @@ class GroupController {
   }
 
   async getOne(req, res, next) {
-    const { user } = req;
     const { id } = req.params;
-    const group = await Group.findOne({ where: { id, userId: user.id } });
-    return res.json({ ...group.dataValues, creator: user });
+    const group = await Group.findOne({ where: { id } });
+    const creator = await User.findOne({ where: { id: group.userId }});
+    return res.json({ ...group.dataValues, creator });
   }
 
   async delete(req, res, next) {
