@@ -24,8 +24,11 @@ const Participant = sequelize.define('participant', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
 });
 
-User.belongsToMany(Group, {through: Participant });
-Group.belongsToMany(User, {through: Participant });
+User.hasMany(Participant);
+Participant.belongsTo(User);
+
+Group.hasMany(Participant);
+Participant.belongsTo(Group);
 
 const Post = sequelize.define("post", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
