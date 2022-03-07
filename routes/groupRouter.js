@@ -7,8 +7,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post("/", checkRole(process.env.ROLE_ADMIN), groupController.create);
 router.put("/", checkRole(process.env.ROLE_ADMIN), groupController.update);
 router.get("/", authMiddleware, groupController.getAll);
-router.get("/:groupId", authMiddleware, groupController.getOne);
-router.delete("/:groupId", checkRole(process.env.ROLE_ADMIN), groupController.delete);
+router.get("/:id", authMiddleware, groupController.getOne);
+router.delete("/:id", checkRole(process.env.ROLE_ADMIN), groupController.delete);
 router.post("/add-with-identificator", authMiddleware, groupController.join);
 
 module.exports = router;
