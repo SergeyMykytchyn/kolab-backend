@@ -11,8 +11,8 @@ class GroupController {
   async update(req, res, next) {
     const { user } = req;
     const { id, name, description } = req.body;
-    const updatedGroup = await Group.update({ name, description }, { where: { id, userId: user.id } });
-    if (!updatedGroup[0].length) {
+    const group = await Group.update({ name, description }, { where: { id, userId: user.id } });
+    if (!group[0].length) {
       return res.json({ message: "Group is not found" });
     }
     return res.json({ message: "Group was updated" });
@@ -33,7 +33,13 @@ class GroupController {
   }
 
   async delete(req, res, next) {
-    
+    const { user } = req;
+    const { id } = req.params;
+    const group = await Group.destroy({ where: { id, userId: user.id } });
+    if (!group) {
+      return res.json({ message: "Group is not found" });
+    }
+    return res.json({ message: "Group was deleted" });
   }
 
   async join(req, res, next) {
