@@ -1,7 +1,7 @@
 const ApiError = require("../error/ApiError");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models/models");
+const { User, Participant } = require("../models/models");
 
 const generateJwt = (id, firstName, lastName, email, role) => {
   return jwt.sign(
@@ -50,6 +50,13 @@ class UserController {
   async userInfo(req, res, next) {
     const { user } = req;
     return res.json(user);
+  }
+
+  async leaveGroup(req, res, next) {
+    const { user } = req;
+    const { groupId } = req.query;
+    const participant = await Participant.destroy({ where: { userId: user.id, groupId } });
+    return res.json({ message: "Ok" });
   }
 }
 
