@@ -7,7 +7,7 @@ const User = sequelize.define("user", {
   lastName: { type: DataTypes.STRING, allowNull: false },
   email: { type: DataTypes.STRING, unique: true, allowNull: false },
   password: { type: DataTypes.STRING, allowNull: false },
-  role: { type: DataTypes.ENUM(["teacher", "student"]), allowNull: false },
+  role: { type: DataTypes.ENUM(["teacher", "student"]), allowNull: false }
 });
 
 const Group = sequelize.define("group", {
@@ -20,10 +20,17 @@ const Group = sequelize.define("group", {
 User.hasMany(Group);
 Group.belongsTo(User);
 
+const Participant = sequelize.define('participant', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+});
+
+User.belongsToMany(Group, {through: Participant });
+Group.belongsToMany(User, {through: Participant });
+
 const Post = sequelize.define("post", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   caption: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.STRING },
+  description: { type: DataTypes.STRING }
 });
 
 Group.hasMany(Post);
