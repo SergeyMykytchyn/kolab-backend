@@ -15,7 +15,10 @@ class GroupController {
   }
 
   async getAll(req, res, next) {
-    
+    const { user } = req;
+    const { userId } = req.query;
+    const groups = await Group.findAll({ where: { userId } });
+    return res.json(groups.map(group => ({ ...group.dataValues, creator: user })));
   }
 
   async getOne(req, res, next) {
