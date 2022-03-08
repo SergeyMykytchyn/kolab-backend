@@ -67,17 +67,13 @@ class UserController {
     const { user } = req;
     let { firstName, lastName, email, password } = req.body;
     const img = req.files ? req.files.img : null;
-    if (!firstName || !lastName) {
-      return next(ApiError.badRequest("Incorrect data"));
+    if (!firstName || !lastName || !email) {
+      return next(ApiError.badRequest("Fields: First name, Last name and Email must be filled"));
     }
 
     const candidate = await User.findOne({ where: { email } });
-    if (candidate) {
+    if (email !== user.email && candidate) {
       return next(ApiError.badRequest("The user with exact email is already exists"));
-    }
-
-    if (!email) {
-      email = user.email;
     }
 
     const currentUser = await User.findOne({ where: { id: user.id }});
