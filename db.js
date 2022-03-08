@@ -1,8 +1,5 @@
 const { Sequelize } = require("sequelize");
 
-console.log(process.env.NODE_ENV == "production");
-console.log(process.env.NODE_ENV);
-
 module.exports = new Sequelize(
   process.env.NODE_ENV === "production" ? process.env.DB_PRODUCTION_NAME : process.env.DB_NAME,
   process.env.NODE_ENV === "production" ? process.env.DB_PRODUCTION_USER : process.env.DB_USER,
