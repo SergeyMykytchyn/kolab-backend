@@ -52,7 +52,8 @@ class UserController {
 
   async userInfo(req, res, next) {
     const { user } = req;
-    return res.json(user);
+    const currentUser = await User.findOne({ where: { id: user.id }});
+    return res.json({ ...currentUser.dataValues, password: null });
   }
 
   async leaveGroup(req, res, next) {
@@ -64,21 +65,27 @@ class UserController {
 
   async update(req, res, next) {
     const { user } = req;
-    const { firstName, lastName, email, password } = req.body;
+    let { firstName, lastName, email, password } = req.body;
     const img = req.files ? req.files.img : null;
     if (!firstName || !lastName) {
       return next(ApiError.badRequest("Incorrect data"));
     }
-    if (email) {
-      const candidate = await User.findOne({ where: { email } });
-      if (candidate) {
-        return next(ApiError.badRequest("The user with exact email is already exists"));
-      }
+
+    const candidate = await User.findOne({ where: { email } });
+    if (candidate) {
+      return next(ApiError.badRequest("The user with exact email is already exists"));
     }
-    const fileName = img ? uuid.v4() + ".jpg" : null;
+
+    if (!email) {
+      email = user.email;
+    }
+
+    const currentUser = await User.findOne({ where: { id: user.id }});
+    const fileName = img ? uuid.v4() + ".jpg" : currentUser.dataValues.img;
     if (img) {
-      const currentUser = await User.findOne({ where: { id: user.id }});
-      fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
+      if (currentUser.dataValues.img) {
+        fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
+      }
       img.mv(path.resolve(__dirname, "..", "static", fileName));
     }
     if (!password) {
