@@ -1,9 +1,3 @@
-Все запросы к серверу начинаются так: https://kolab-plumboomteam-api.herokuapp.com/api
-Дальше идет название определенного эндпоинта например: /User/sign-up
-То есть итого запрос на сервер будет иметь следующий вид: https://kolab-plumboomteam-api.herokuapp.com/api/User/sign-up
-
-Дальше идет список эндпоинтов и их сигнатуры
-
 Эндпоинт для регистрации нового пользователя: /User/sign-up
 Request Method: POST
 Request Payload: {
@@ -15,7 +9,7 @@ Request Payload: {
   role: "teacher" || "student"
 }
 Response: {
-  message: "User was created"
+  token: string
 }
 
 Эндпоинт для авторизации пользователя: /User/sign-in
@@ -32,11 +26,10 @@ Response: {
 Request Method: GET
 Authorization: Bearer [token]
 Response: {
+  id: string
   email: string
   firstName: string
-  id: string
   lastName: string
-  password: null
   role: "teacher" || "student"
 }
 
@@ -45,24 +38,18 @@ Request Method: GET
 Authorization: Bearer [token]
 Response: [
   {
-    childGroups: []
+    id: number
+    userId: string
     creator: {
+      id: string
       email: string
       firstName: string
-      id: string
       lastName: string
-      password: null
-      role: null
+      role: "teacher" || "student"
     }
-    creatorId: string
-    description: string
-    id: number
-    identificator: string
     name: string
-    parentGroupId: null
-    participants: []
-    tasks: []
-    usefulContent: null
+    description: string
+    identificator: string
   }
 ]
 
@@ -70,41 +57,30 @@ Response: [
 Request Method: POST
 Authorization: Bearer [token]
 Request Payload: {
-  description: string
   name: string
+  description: string
 }
 Response: {
-  childGroups: []
-  creator: null
-  creatorId: string
-  description: string
   id: number
-  identificator: string
+  userId: string
   name: string
-  parentGroupId: null
-  participants: []
-  tasks: []
-  usefulContent: null
+  description: string
+  identificator: string
 }
 
 Эндпоинт для редактирования уже существующего проекта: /Group
 Request Method: PUT
 Authorization: Bearer [token]
 Request Payload: {
-  childGroups: []
+  id: number
+  userId: string
   creator: {
     firstName: string
     lastName: string
   }
-  creatorId: string
-  description: string
-  id: number
-  identificator: string
   name: string
-  parentGroupId: null
-  participants: []
-  tasks: []
-  usefulContent: null
+  description: string
+  identificator: string
 }
 Response: {
   message: "Group was updated"
@@ -128,26 +104,22 @@ Response: {
 Эндпоинт для того чтобы присоединится к проекту: /Group/add-with-identificator
 Request Method: POST
 Authorization: Bearer [token]
-Request Payload: string
+Request Payload: {
+  identificator: string
+}
 Response: {
-  childGroups: []
+  id: number
+  userId: string
   creator: {
+    id: string
     email: string
     firstName: string
-    id: string
     lastName: string
-    password: null
-    role: null
+    role: "teacher" || "student"
   }
-  creatorId: string
-  description: string
-  id: number
-  identificator: string
   name: string
-  parentGroupId: null
-  participants: []
-  tasks: []
-  usefulContent: null
+  description: string
+  identificator: string
 }
 
 Эндпоинт для получения информации о задачах на текущем проекте: /Post/?groupId=
@@ -155,22 +127,25 @@ Request Method: GET
 Authorization: Bearer [token]
 Response: [
   {
-    acknowledgeUsers: [
-      {
-        email: string
-        firstName: string
-        id: string
-        lastName: string
-        password: null
-        role: null
-      }
-    ]
-    caption: string
-    comments: []
-    description: string
-    forms: []
-    groupId: number
     id: number
+    groupId: number
+    caption: string
+    description: string
+    forms: [
+      {
+        id: number
+        postId: number
+        userId: number
+        content: string
+        user: {
+          id: string
+          email: string
+          firstName: string
+          lastName: string
+          role: "teacher" || "student"
+        }
+      }
+    ]  
   }
 ]
 
@@ -178,33 +153,18 @@ Response: [
 Request Method: GET
 Authorization: Bearer [token]
 Response: {
-  childGroups: []
+  id: number
+  userId: number
   creator: {
+    id: number
     email: string
     firstName: string
-    id: string
     lastName: string
-    password: null
-    role: null
+    role: "teacher" || "student"
   }
-  creatorId: string
-  description: string
-  id: number
-  identificator: string
   name: string
-  parentGroupId: null
-  participants: [
-    {
-      email: string
-      firstName: string
-      id: string
-      lastName: string
-      password: null
-      role: null
-    }
-  ]
-  tasks: []
-  usefulContent: null
+  description: string
+  identificator: string
 }
 
 Эндпоинт для создания нового задания: /Post
@@ -216,13 +176,11 @@ Request Payload: {
   groupId: number
 }
 Response: {
-  acknowledgeUsers: []
+  id: number
+  groupId: number
   caption: string
-  comments: []
   description: string
   forms: []
-  groupId: number
-  id: number
 }
 
 Эндпоинт для создания сообщения в задании: /Form
@@ -233,16 +191,16 @@ Request Payload: {
   postId: number
 }
 Response: {
-  content: string
   id: number
   postId: number
+  userId: number
+  content: string
   user: {
-    email: null
-    firstName: null
-    id: string
-    lastName: null
-    password: null
-    role: null
+    id: number
+    email: string
+    firstName: string
+    lastName: string
+    role: "teacher" || "student"
   }
 }
 
@@ -250,46 +208,23 @@ Response: {
 Request Method: GET
 Authorization: Bearer [token]
 Response: {
-  acknowledgeUsers: [
-    {
-      email: string
-      firstName: string
-      id: string
-      lastName: string
-      password: null
-      role: null
-    }
-  ]
+  id: number
+  groupId: number
   caption: string
-  comments: []
   description: string
   forms: [
     {
-      content: string
       id: number
+      userId: number
       postId: number
+      content: string
       user: {
+        id: string
         email: string
         firstName: string
-        id: string
         lastName: string
-        password: null
-        role: null
+        role: "teacher" || "student"
       }
     }
   ]
-  groupId: number
-  id: number
-}
-
-Эндпоинт для обновления сообщения в текущем задании: /Form
-Request Method: PUT
-Authorization: Bearer [token]
-Request Payload: {
-  content: string
-  id: number
-  postId: number
-}
-Response: {
-  message: "Form was updated"
 }
