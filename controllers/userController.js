@@ -87,7 +87,8 @@ class UserController {
       const hashPassword = await bcrypt.hash(password, 6);
       const updatedUser = await User.update({ firstName, lastName, email, password: hashPassword, img: fileName }, { where: { id: user.id } });
     }
-    return res.json({ message: "User was updated" });
+    const resultedUser = await User.findOne({ where: { id: user.id }});
+    return res.json({ ...resultedUser.dataValues, password: null });
   }
 }
 
