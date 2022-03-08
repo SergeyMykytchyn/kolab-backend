@@ -1,3 +1,6 @@
+const uuid = require("uuid");
+const path = require("path");
+const fs = require("fs");
 const ApiError = require("../error/ApiError");
 const { User, Group, Participant } = require("../models/models");
 var validator = require("validator");
@@ -6,14 +9,31 @@ class GroupController {
   async create(req, res, next) {
     const { user } = req;
     const { name, description } = req.body;
-    const group = await Group.create({ name, description, userId: user.id });
+    const img = req.files ? req.files.img : null;
+    const fileName = img ? uuid.v4() + ".jpg" : null;
+    if (img) {
+      img.mv(path.resolve(__dirname, "..", "static", fileName));
+    }
+
+    const group = await Group.create({ name, description, userId: user.id, img: fileName });
     return res.json(group);
   }
 
   async update(req, res, next) {
     const { user } = req;
     const { id, name, description } = req.body;
-    const group = await Group.update({ name, description }, { where: { id, userId: user.id } });
+    const img = req.files ? req.files.img : null;
+    
+    const currentGroup = await Group.findOne({ where: { id } });
+    const fileName = img ? uuid.v4() + ".jpg" : currentGroup.dataValues.img;
+    if (img) {
+      if (currentGroup.dataValues.img) {
+        fs.unlinkSync(path.resolve(__dirname, "..", "static", currentGroup.dataValues.img));
+      }
+      img.mv(path.resolve(__dirname, "..", "static", fileName));
+    }
+
+    const group = await Group.update({ name, description, img: fileName }, { where: { id, userId: user.id } });
     if (!group[0]) {
       return next(ApiError.internal("Group is not found"));
     }
@@ -23,7 +43,8 @@ class GroupController {
   async getAll(req, res, next) {
     const { user } = req;
     const groupsUser = await Group.findAll({ where: { userId: user.id } });
-    const groupsUserResult = groupsUser.map(group => ({ ...group.dataValues, creator: user }));
+    const currentUser = await User.findOne({ where: { id: user.id } });
+    const groupsUserResult = groupsUser.map(group => ({ ...group.dataValues, creator: { ...currentUser.dataValues, password: null } }));
 
     let groupsParticipant = await Participant.findAll({
       where: { userId: user.id },
