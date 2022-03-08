@@ -7,14 +7,16 @@ const User = sequelize.define("user", {
   lastName: { type: DataTypes.STRING, allowNull: false },
   email: { type: DataTypes.STRING, unique: true, allowNull: false },
   password: { type: DataTypes.STRING, allowNull: false },
-  role: { type: DataTypes.ENUM(["teacher", "student"]), allowNull: false }
+  role: { type: DataTypes.ENUM(["teacher", "student"]), allowNull: false },
+  img: { type: DataTypes.STRING }
 });
 
 const Group = sequelize.define("group", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.STRING },
-  identificator: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, unique: true }
+  identificator: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, unique: true },
+  img: { type: DataTypes.STRING }
 });
 
 User.hasMany(Group);
