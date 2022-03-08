@@ -5,7 +5,6 @@ const path = require("path");
 const fs = require("fs");
 const ApiError = require("../error/ApiError");
 const { User, Participant } = require("../models/models");
-const { user } = require("pg/lib/defaults");
 
 const generateJwt = (id, firstName, lastName, email, role) => {
   return jwt.sign(
