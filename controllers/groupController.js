@@ -37,7 +37,7 @@ class GroupController {
     const addCreators = async () => {
       for (let i = 0; i < groupsParticipant.length; i++) {
         const creator = await User.findOne({ where: { id: groupsParticipant[i].userId } });
-        groupsParticipantResult.push({ ...groupsParticipant[i].dataValues, creator });
+        groupsParticipantResult.push({ ...groupsParticipant[i].dataValues, creator: { ...creator.dataValues, password: null } });
       }
     };
 
@@ -49,7 +49,7 @@ class GroupController {
     const { id } = req.params;
     const group = await Group.findOne({ where: { id } });
     const creator = await User.findOne({ where: { id: group.userId }});
-    return res.json({ ...group.dataValues, creator });
+    return res.json({ ...group.dataValues, creator: { ...creator.dataValues, password: null } });
   }
 
   async delete(req, res, next) {
@@ -81,7 +81,7 @@ class GroupController {
       return next(ApiError.internal("You already participate this group"));
     }
     const newParticipant = await Participant.create({ userId: user.id, groupId: group.id });
-    return res.json({ ...group.dataValues, creator });
+    return res.json({ ...group.dataValues, creator: { ...creator.dataValues, password: null } });
   }
 }
 

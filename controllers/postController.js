@@ -14,7 +14,7 @@ class PostController {
       let forms = [];
       for (let j = 0; j < posts[i].forms.length; j++) {
         const user = await User.findOne({ where: { id: posts[i].forms[j].dataValues.userId } });
-        forms.push({ ...posts[i].forms[j].dataValues, user });
+        forms.push({ ...posts[i].forms[j].dataValues, user: { ...user.dataValues, password: null } });
       }
       postsResult.push({ ...posts[i].dataValues, forms });
     }
@@ -38,7 +38,7 @@ class PostController {
     let forms = [];
     for (let j = 0; j < post.forms.length; j++) {
       const user = await User.findOne({ where: { id: post.forms[j].dataValues.userId } });
-      forms.push({ ...post.forms[j].dataValues, user });
+      forms.push({ ...post.forms[j].dataValues, user: { ...user.dataValues, password: null } });
     }
     const postsResult = { ...post.dataValues, forms };
     return res.json(postsResult);
