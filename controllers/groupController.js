@@ -28,7 +28,11 @@ class GroupController {
     const fileName = img ? uuid.v4() + ".jpg" : currentGroup.dataValues.img;
     if (img) {
       if (currentGroup.dataValues.img) {
-        fs.unlinkSync(path.resolve(__dirname, "..", "static", currentGroup.dataValues.img));
+        fs.stat(path.resolve(__dirname, "..", "static", currentGroup.dataValues.img), function(err, stat) {
+          if(err == null) {
+            fs.unlinkSync(path.resolve(__dirname, "..", "static", currentGroup.dataValues.img));
+          }
+        });
       }
       img.mv(path.resolve(__dirname, "..", "static", fileName));
     }
