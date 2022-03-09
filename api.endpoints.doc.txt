@@ -1,3 +1,9 @@
+Все запросы к серверу начинаются так: https://kolab-backend.herokuapp.com/api
+Дальше идет название определенного эндпоинта например: /User/sign-up
+То есть итого запрос на сервер будет иметь следующий вид: https://kolab-backend.herokuapp.com/api/User/sign-up
+
+Дальше идет список эндпоинтов и их сигнатуры
+
 Эндпоинт для регистрации нового пользователя: /User/sign-up
 Request Method: POST
 Request Payload: {
