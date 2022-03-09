@@ -80,7 +80,11 @@ class UserController {
     const fileName = img ? uuid.v4() + ".jpg" : currentUser.dataValues.img;
     if (img) {
       if (currentUser.dataValues.img) {
-        fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
+        fs.stat(path.resolve(__dirname, "..", "static", currentUser.dataValues.img), function(err, stat) {
+          if(err == null) {
+            fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
+          }
+        });
       }
       img.mv(path.resolve(__dirname, "..", "static", fileName));
     }
