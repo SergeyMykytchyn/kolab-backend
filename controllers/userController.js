@@ -38,6 +38,9 @@ class UserController {
 
   async signIn(req, res, next) {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return next(ApiError.badRequest("All fileds must be filled"));
+    }
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return next(ApiError.internal("The user is not found"));
