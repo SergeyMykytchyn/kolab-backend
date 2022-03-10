@@ -18,7 +18,7 @@ class UserController {
   async signUp(req, res, next) {
     const { firstName, lastName, email, password, passwordConfirm, role } = req.body;
     if (!firstName || !lastName || !email || !password || !role) {
-      return next(ApiError.badRequest("Incorrect data"));
+      return next(ApiError.badRequest("All fileds must be filled"));
     }
     if (password !== passwordConfirm) {
       return next(ApiError.badRequest("Passwords does not match"));
