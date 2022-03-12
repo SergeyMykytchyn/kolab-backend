@@ -16,92 +16,112 @@ const generateJwt = (id, firstName, lastName, email, role) => {
 
 class UserController {
   async signUp(req, res, next) {
-    const { firstName, lastName, email, password, passwordConfirm, role } = req.body;
-    if (!firstName || !lastName || !email || !password || !role) {
-      return next(ApiError.badRequest("All fileds must be filled"));
+    try {
+      const { firstName, lastName, email, password, passwordConfirm, role } = req.body;
+      if (!firstName || !lastName || !email || !password || !role) {
+        return next(ApiError.badRequest("All fileds must be filled"));
+      }
+      if (password !== passwordConfirm) {
+        return next(ApiError.badRequest("Passwords does not match"));
+      }
+      if (role !== "teacher" && role !== "student") {
+        return next(ApiError.badRequest("The role is incorrect"));
+      }
+      const candidate = await User.findOne({ where: { email } });
+      if (candidate) {
+        return next(ApiError.badRequest("The user with exact email is already exists"));
+      }
+      const hashPassword = await bcrypt.hash(password, 6);
+      const user = await User.create({ firstName, lastName, email, role, password: hashPassword });
+      const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
+      return res.json({ token });
+    } catch(err) {
+      return next(ApiError.internal(err.message));
     }
-    if (password !== passwordConfirm) {
-      return next(ApiError.badRequest("Passwords does not match"));
-    }
-    if (role !== "teacher" && role !== "student") {
-      return next(ApiError.badRequest("The role is incorrect"));
-    }
-    const candidate = await User.findOne({ where: { email } });
-    if (candidate) {
-      return next(ApiError.badRequest("The user with exact email is already exists"));
-    }
-    const hashPassword = await bcrypt.hash(password, 6);
-    const user = await User.create({ firstName, lastName, email, role, password: hashPassword });
-    const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
-    return res.json({ token });
   }
 
   async signIn(req, res, next) {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return next(ApiError.badRequest("All fileds must be filled"));
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return next(ApiError.badRequest("All fileds must be filled"));
+      }
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return next(ApiError.internal("The user with such email does not exits"));
+      }
+      const comparePassword = bcrypt.compareSync(password, user.password);
+      if (!comparePassword) {
+        return next(ApiError.internal("The password is incorrect"));
+      }
+      const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
+      return res.json({ token });
+    } catch(err) {
+      return next(ApiError.internal(err.message));
     }
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return next(ApiError.internal("The user with such email does not exits"));
-    }
-    const comparePassword = bcrypt.compareSync(password, user.password);
-    if (!comparePassword) {
-      return next(ApiError.internal("The password is incorrect"));
-    }
-    const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
-    return res.json({ token });
   }
 
   async userInfo(req, res, next) {
-    const { user } = req;
-    const currentUser = await User.findOne({ where: { id: user.id }});
-    if (currentUser) {
-      return res.json({ ...currentUser.dataValues, password: null });
+    try {
+      const { user } = req;
+      const currentUser = await User.findOne({ where: { id: user.id }});
+      if (currentUser) {
+        return res.json({ ...currentUser.dataValues, password: null });
+      }
+      return next(ApiError.badRequest("The user is not found"));
+    } catch(err) {
+      return next(ApiError.internal(err.message));
     }
-    return next(ApiError.badRequest("The user is not found"));
   }
 
   async leaveGroup(req, res, next) {
-    const { user } = req;
-    const { groupId } = req.query;
-    const participant = await Participant.destroy({ where: { userId: user.id, groupId } });
-    return res.json({ message: "Ok" });
+    try {
+      const { user } = req;
+      const { groupId } = req.query;
+      const participant = await Participant.destroy({ where: { userId: user.id, groupId } });
+      return res.json({ message: "Ok" });
+    } catch(err) {
+      return next(ApiError.internal(err.message));
+    }
   }
 
   async update(req, res, next) {
-    const { user } = req;
-    let { firstName, lastName, email, password } = req.body;
-    const img = req.files ? req.files.img : null;
-    if (!firstName || !lastName || !email) {
-      return next(ApiError.badRequest("Fields: First name, Last name and Email must be filled"));
-    }
-
-    const candidate = await User.findOne({ where: { email } });
-    if (email !== user.email && candidate) {
-      return next(ApiError.badRequest("The user with exact email is already exists"));
-    }
-
-    const currentUser = await User.findOne({ where: { id: user.id }});
-    const fileName = img ? uuid.v4() + ".jpg" : currentUser.dataValues.img;
-    if (img) {
-      if (currentUser.dataValues.img) {
-        fs.stat(path.resolve(__dirname, "..", "static", currentUser.dataValues.img), function(err, stat) {
-          if(err == null) {
-            fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
-          }
-        });
+    try {
+      const { user } = req;
+      let { firstName, lastName, email, password } = req.body;
+      const img = req.files ? req.files.img : null;
+      if (!firstName || !lastName || !email) {
+        return next(ApiError.badRequest("Fields: First name, Last name and Email must be filled"));
       }
-      img.mv(path.resolve(__dirname, "..", "static", fileName));
+
+      const candidate = await User.findOne({ where: { email } });
+      if (email !== user.email && candidate) {
+        return next(ApiError.badRequest("The user with exact email is already exists"));
+      }
+
+      const currentUser = await User.findOne({ where: { id: user.id }});
+      const fileName = img ? uuid.v4() + ".jpg" : currentUser.dataValues.img;
+      if (img) {
+        if (currentUser.dataValues.img) {
+          fs.stat(path.resolve(__dirname, "..", "static", currentUser.dataValues.img), function(err, stat) {
+            if(err == null) {
+              fs.unlinkSync(path.resolve(__dirname, "..", "static", currentUser.dataValues.img));
+            }
+          });
+        }
+        img.mv(path.resolve(__dirname, "..", "static", fileName));
+      }
+      if (!password) {
+        const updatedUser = await User.update({ firstName, lastName, email, img: fileName }, { where: { id: user.id } });
+      } else {
+        const hashPassword = await bcrypt.hash(password, 6);
+        const updatedUser = await User.update({ firstName, lastName, email, password: hashPassword, img: fileName }, { where: { id: user.id } });
+      }
+      const resultedUser = await User.findOne({ where: { id: user.id }});
+      return res.json({ ...resultedUser.dataValues, password: null });
+    } catch(err) {
+      return next(ApiError.internal(err.message));
     }
-    if (!password) {
-      const updatedUser = await User.update({ firstName, lastName, email, img: fileName }, { where: { id: user.id } });
-    } else {
-      const hashPassword = await bcrypt.hash(password, 6);
-      const updatedUser = await User.update({ firstName, lastName, email, password: hashPassword, img: fileName }, { where: { id: user.id } });
-    }
-    const resultedUser = await User.findOne({ where: { id: user.id }});
-    return res.json({ ...resultedUser.dataValues, password: null });
   }
 }
 
