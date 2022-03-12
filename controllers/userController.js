@@ -56,7 +56,10 @@ class UserController {
   async userInfo(req, res, next) {
     const { user } = req;
     const currentUser = await User.findOne({ where: { id: user.id }});
-    return res.json({ ...currentUser.dataValues, password: null });
+    if (currentUser) {
+      return res.json({ ...currentUser.dataValues, password: null });
+    }
+    return next(ApiError.badRequest("The user is not found"));
   }
 
   async leaveGroup(req, res, next) {

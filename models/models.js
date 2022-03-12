@@ -35,7 +35,7 @@ Participant.belongsTo(Group);
 const Post = sequelize.define("post", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   caption: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.STRING }
+  description: { type: DataTypes.TEXT }
 });
 
 Group.hasMany(Post);
@@ -43,7 +43,7 @@ Post.belongsTo(Group);
 
 const Form = sequelize.define("form", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  content: { type: DataTypes.STRING, allowNull: false }
+  content: { type: DataTypes.TEXT, allowNull: false }
 });
 
 User.hasMany(Form);
