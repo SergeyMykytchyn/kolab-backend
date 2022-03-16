@@ -36,7 +36,7 @@ class UserController {
       const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
       return res.json({ token });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -57,7 +57,7 @@ class UserController {
       const token = generateJwt(user.id, user.firstName, user.lastName, user.email, user.role);
       return res.json({ token });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -70,7 +70,7 @@ class UserController {
       }
       return next(ApiError.badRequest("The user is not found"));
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -81,7 +81,7 @@ class UserController {
       const participant = await Participant.destroy({ where: { userId: user.id, groupId } });
       return res.json({ message: "Ok" });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -120,7 +120,7 @@ class UserController {
       const resultedUser = await User.findOne({ where: { id: user.id }});
       return res.json({ ...resultedUser.dataValues, password: null });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 }

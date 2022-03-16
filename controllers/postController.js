@@ -22,17 +22,20 @@ class PostController {
       }
       return res.json(postsResult);
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
   async create(req, res, next) {
     try {
       const { caption, description, groupId } = req.body;
+      if (!caption || !description) {
+        return next(ApiError.badRequest("All fileds must be filled"));
+      }
       const post = await Post.create({ caption, description, groupId });
       return res.json({ ...post.dataValues, forms: [] });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -53,7 +56,7 @@ class PostController {
       const postsResult = { ...post.dataValues, forms };
       return res.json(postsResult);
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 }

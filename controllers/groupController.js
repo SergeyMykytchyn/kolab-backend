@@ -19,7 +19,7 @@ class GroupController {
       const group = await Group.create({ name, description, userId: user.id, img: fileName });
       return res.json(group);
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -48,7 +48,7 @@ class GroupController {
       }
       return res.json({ message: "Group was updated" });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -78,7 +78,7 @@ class GroupController {
       await addCreators();
       return res.json([ ...groupsUserResult, ...groupsParticipantResult ].sort((a, b) => a.id - b.id));
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -89,7 +89,7 @@ class GroupController {
       const creator = await User.findOne({ where: { id: group.userId }});
       return res.json({ ...group.dataValues, creator: { ...creator.dataValues, password: null } });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -103,7 +103,7 @@ class GroupController {
       }
       return res.json({ message: "Group was deleted" });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 
@@ -120,7 +120,7 @@ class GroupController {
       }
       const creator = await User.findOne({ where: { id: group.userId } });
       if (group.userId === user.id ) {
-        return next(ApiError.internal("This user is a creator"));
+        return next(ApiError.internal("You already participate this group"));
       }
       const participant = await Participant.findOne({ where: { userId: user.id, groupId: group.id } });
       if (participant) {
@@ -129,7 +129,7 @@ class GroupController {
       const newParticipant = await Participant.create({ userId: user.id, groupId: group.id });
       return res.json({ ...group.dataValues, creator: { ...creator.dataValues, password: null } });
     } catch(err) {
-      return next(ApiError.internal(err.message));
+      return next(ApiError.internal("Unexpected error"));
     }
   }
 }

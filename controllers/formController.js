@@ -5,10 +5,13 @@ class FormController {
     try {
       const { user } = req;
       const { content, postId } = req.body;
+      if (!content) {
+        return next(ApiError.badRequest("All fileds must be filled"));
+      }
       const form = await Form.create({ content, postId, userId: user.id });
       return res.json({ ...form.dataValues, user });
     } catch(err) {
-      return next(ApiError.badRequest("All fileds must be filled"));
+      return next(ApiError.badRequest("Unexpected error"));
     }
   }
 }
